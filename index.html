@@ -1,1 +1,517 @@
-index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111111">
+<title>KashmirSellz | Shop Smart</title>
+
+<style>
+:root {
+ --bg:#0d0d0f;
+ --card:#19191c;
+ --gold:#d8b66a;
+ --white:#f8f5ed;
+ --muted:#aaa;
+ --line:#343438;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:var(--bg);color:var(--white);
+ font-family:Arial,sans-serif;
+}
+header{
+ background:#111;border-bottom:1px solid var(--line);
+ padding:17px;position:sticky;top:0;z-index:10;
+}
+.nav{
+ max-width:1100px;margin:auto;display:flex;
+ justify-content:space-between;align-items:center;gap:10px;
+}
+.brand{font-size:21px;font-weight:900;letter-spacing:2px;color:var(--gold)}
+.tag{font-size:9px;letter-spacing:2px;color:var(--muted)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.btn{
+ padding:10px 14px;border-radius:9px;
+ border:1px solid var(--line);
+ background:#252528;color:white;
+}
+.gold{
+ background:var(--gold);color:#17130a;
+ border-color:var(--gold);font-weight:bold;
+}
+main{max-width:1100px;margin:auto;padding:20px}
+.hero{
+ padding:30px 24px;border:1px solid #66532c;
+ border-radius:18px;
+ background:radial-gradient(ellipse at 90% 10%,#514020,#191919 65%);
+ display:flex;justify-content:space-between;align-items:center;
+ gap:15px;
+}
+.hero h1{font-size:38px;color:#f1d99a;margin:10px 0}
+.hero p{color:#ccc;max-width:440px;line-height:1.6}
+.hero-mark{
+ border:2px solid var(--gold);border-radius:50%;
+ width:100px;height:100px;display:grid;place-items:center;
+ color:var(--gold);font-size:34px;font-weight:bold;
+}
+h2{font-size:22px}
+.search{
+ width:100%;padding:13px;border-radius:10px;
+ background:var(--card);border:1px solid var(--line);
+ color:white;margin:20px 0 12px;
+}
+.categories{
+ display:flex;gap:8px;overflow-x:auto;padding:5px 0 15px;
+}
+.chip{
+ white-space:nowrap;padding:9px 14px;border-radius:30px;
+ background:var(--card);color:white;border:1px solid var(--line);
+}
+.chip.active{background:var(--gold);color:#111}
+.grid{
+ display:grid;grid-template-columns:repeat(4,1fr);gap:13px;
+}
+.product{
+ background:var(--card);border:1px solid var(--line);
+ border-radius:13px;overflow:hidden;
+}
+.photo{
+ height:135px;background:#25231e;
+ display:grid;place-items:center;font-size:43px;
+ color:var(--gold);overflow:hidden;
+}
+.photo img{width:100%;height:100%;object-fit:cover}
+.details{padding:12px}
+.details h3{font-size:14px;margin:5px 0}
+.small{font-size:11px;color:var(--muted)}
+.price{color:#f1d99a;font-weight:bold;margin:9px 0}
+.add{
+ width:100%;padding:9px;border:0;border-radius:8px;
+ background:var(--gold);font-weight:bold;
+}
+.panel{
+ margin-top:22px;padding:17px;
+ background:var(--card);border:1px solid var(--line);
+ border-radius:14px;
+}
+.field{
+ width:100%;padding:11px;margin:5px 0;
+ background:#242427;color:white;
+ border:1px solid var(--line);border-radius:8px;
+}
+.row{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;
+ padding:10px 0;border-bottom:1px solid var(--line);
+}
+.hidden{display:none}
+footer{
+ text-align:center;padding:30px 15px;
+ color:var(--muted);border-top:1px solid var(--line);
+ margin-top:35px;line-height:1.9;
+}
+footer strong{color:var(--gold)}
+@media(max-width:750px){
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero h1{font-size:29px}
+ .hero-mark{width:70px;height:70px;font-size:25px}
+}
+@media(max-width:380px){
+ .brand{font-size:16px}
+ main{padding:12px}
+ .grid{gap:8px}
+ .photo{height:110px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="nav">
+  <div>
+   <div class="brand">KASHMIRSELLZ</div>
+   <div class="tag">SHOP SMART. SHOP LOCAL.</div>
+  </div>
+  <div>
+   <button class="btn" onclick="toggleAdmin()">OWNER</button>
+   <button class="btn gold" onclick="goCart()">CART (<span id="count">0</span>)</button>
+  </div>
+ </div>
+</header>
+
+<main>
+
+<section class="hero">
+ <div>
+  <div style="color:#d8b66a;letter-spacing:2px;font-size:11px">
+   THE SHOPPING DESTINATION
+  </div>
+  <h1>Find what<br>you love.</h1>
+  <p>Discover electronics, stationery, fashion, home appliances and much more.</p>
+  <button class="btn gold" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+   Explore products
+  </button>
+ </div>
+ <div class="hero-mark">KS</div>
+</section>
+
+<section id="shop">
+ <h2>Explore our collection</h2>
+ <input id="search" class="search" placeholder="Search for products..." oninput="render()">
+ <div class="categories" id="categories"></div>
+ <div class="grid" id="products"></div>
+</section>
+
+<section class="panel" id="cart">
+ <h2>Your shopping cart</h2>
+ <div id="cartItems">Your cart is empty.</div>
+ <div class="row">
+  <strong>Total</strong>
+  <strong class="price" id="total">₹0</strong>
+ </div>
+ <h3>Customer details</h3>
+ <input id="customer" class="field" placeholder="Your name">
+ <input id="phone" class="field" placeholder="Phone number">
+ <input id="address" class="field" placeholder="Delivery address">
+ <button class="btn gold" style="width:100%" onclick="checkout()">
+  Place demo order
+ </button>
+ <p class="small">Demo only. Online ordering will be connected in a later version.</p>
+</section>
+
+<section class="panel hidden" id="admin">
+ <h2>Owner dashboard</h2>
+ <p class="small">Add your teacher's real products here.</p>
+
+ <input id="pname" class="field" placeholder="Product name">
+ <input id="pprice" class="field" type="number" placeholder="Price in ₹">
+ <input id="pcat" class="field" placeholder="Category">
+ <label class="small">Product photo</label>
+ <input id="pimage" class="field" type="file" accept="image/*">
+
+ <button class="btn gold" style="width:100%" onclick="addProduct()">
+  Add product
+ </button>
+
+ <div id="adminList"></div>
+ <button class="btn" onclick="toggleAdmin()">Close dashboard</button>
+ <p class="small">
+  Important: this demo saves changes only in this browser.
+  Secure online owner access and shared storage are not connected yet.
+ </p>
+</section>
+
+</main>
+
+<footer>
+ <div style="font-size:20px;font-weight:bold;color:#d8b66a;letter-spacing:2px">
+  KASHMIRSELLZ
+ </div>
+ SHOP SMART. SHOP LOCAL.
+ <br><br>
+ <strong>MADE IN KASHMIR</strong>
+ <br>BY<br>
+ <strong>MOHD FAIZAN BHAT</strong>
+</footer>
+
+<script>
+
+// 100 UNIQUE SAMPLE PRODUCTS
+const groups = {
+ "Stationery":[
+ "Ballpoint Pen","Gel Pen","Fountain Pen","Pencil",
+ "Mechanical Pencil","Eraser","Sharpener","Ruler",
+ "Geometry Box","Notebook","Register","Drawing Book",
+ "Graph Paper Pad","Highlighter","Permanent Marker",
+ "Whiteboard Marker","Stapler","Paper Punch",
+ "Glue Stick","Watercolour Paint Set"
+ ],
+ "Electronics":[
+ "Wireless Headphones","Wired Earphones","Bluetooth Speaker",
+ "Mobile Phone","Tablet","Laptop","Desktop Computer",
+ "Computer Monitor","Mechanical Keyboard","Wireless Mouse",
+ "Power Bank","Mobile Charger","USB Cable","Type-C Hub",
+ "USB Flash Drive","Memory Card","Wi-Fi Router",
+ "Webcam","Smartwatch","Digital Camera"
+ ],
+ "Home Appliances":[
+ "Refrigerator","Washing Machine","Microwave Oven",
+ "Air Conditioner","Air Cooler","Room Heater",
+ "Electric Kettle","Mixer Grinder","Juicer","Toaster",
+ "Air Fryer","Induction Cooktop","Water Purifier",
+ "Vacuum Cleaner","Electric Iron","Geyser","Ceiling Fan",
+ "LED Television","Dishwasher","Rice Cooker"
+ ],
+ "Home & Kitchen":[
+ "Pressure Cooker","Non-Stick Frying Pan","Dinner Set",
+ "Water Jug","Storage Container","Kitchen Knife Set",
+ "Cutting Board","Bedsheet","Pillow","Wall Clock"
+ ],
+ "Fashion":[
+ "Men's T-Shirt","Women's Kurti","Jeans","Hoodie",
+ "Sports Shoes","Sandals","Backpack","Wallet",
+ "Wristwatch","Sunglasses"
+ ],
+ "Personal Care":[
+ "Hair Dryer","Hair Straightener","Electric Trimmer",
+ "Comb","Hair Brush","Face Wash","Moisturizer",
+ "Shampoo","Body Lotion","Perfume"
+ ],
+ "Sports & Toys":[
+ "Cricket Bat","Cricket Ball","Football",
+ "Badminton Racket","Chess Set","Carrom Board",
+ "School Backpack","Bicycle Helmet","Yoga Mat",
+ "Building Blocks"
+ ]
+};
+
+const icons = {
+ "Stationery":"✏️",
+ "Electronics":"🎧",
+ "Home Appliances":"🏠",
+ "Home & Kitchen":"🍳",
+ "Fashion":"👕",
+ "Personal Care":"🧴",
+ "Sports & Toys":"🏏"
+};
+
+let products=[];
+let id=1;
+
+Object.entries(groups).forEach(([category,names],groupIndex)=>{
+ names.forEach((name,index)=>{
+  products.push({
+   id:id++,
+   name:name,
+   category:category,
+   price:99+(groupIndex*173)+(index*37),
+   image:"",
+   icon:icons[category]
+  });
+ });
+});
+
+// Load locally saved catalogue
+try{
+ const saved=localStorage.getItem("ks_products");
+ if(saved) products=JSON.parse(saved);
+}catch(e){}
+
+// Cart
+let cart={};
+try{
+ cart=JSON.parse(localStorage.getItem("ks_cart")||"{}");
+}catch(e){cart={};}
+
+let active="All";
+
+function save(){
+ try{
+  localStorage.setItem("ks_products",JSON.stringify(products));
+  localStorage.setItem("ks_cart",JSON.stringify(cart));
+ }catch(e){
+  alert("Storage is full. Try smaller product photos.");
+ }
+}
+
+function money(n){
+ return "₹"+Number(n).toLocaleString("en-IN");
+}
+
+function categories(){
+ let cats=["All",...new Set(products.map(p=>p.category))];
+ document.getElementById("categories").innerHTML=
+ cats.map(c=>`
+ <button class="chip ${active===c?'active':''}"
+ onclick="active='${c}';render()">${c}</button>
+ `).join("");
+}
+
+function render(){
+ categories();
+
+ let query=document.getElementById("search").value.toLowerCase();
+
+ let list=products.filter(p=>
+ (active==="All"||p.category===active)&&
+ p.name.toLowerCase().includes(query)
+ );
+
+ document.getElementById("products").innerHTML=list.map(p=>`
+ <article class="product">
+  <div class="photo">
+   ${p.image?
+    `<img src="${p.image}" alt="${p.name}">`:
+    p.icon
+   }
+  </div>
+  <div class="details">
+   <div class="small">${p.category}</div>
+   <h3>${p.name}</h3>
+   <div class="price">${money(p.price)}</div>
+   <button class="add" onclick="addCart(${p.id})">
+    Add to cart
+   </button>
+  </div>
+ </article>
+ `).join("")||"<p>No products found.</p>";
+
+ renderCart();
+ renderAdmin();
+}
+
+function addCart(id){
+ cart[id]=(cart[id]||0)+1;
+ save();
+ renderCart();
+}
+
+function changeQty(id,change){
+ cart[id]=(cart[id]||0)+change;
+ if(cart[id]<=0) delete cart[id];
+ save();
+ renderCart();
+}
+
+function renderCart(){
+ let total=0,count=0;
+ let html="";
+
+ Object.entries(cart).forEach(([id,qty])=>{
+  let p=products.find(x=>x.id==id);
+  if(!p)return;
+
+  total+=p.price*qty;
+  count+=qty;
+
+  html+=`
+  <div class="row">
+   <div>${p.name}<br><span class="small">${money(p.price)}</span></div>
+   <div>
+    <button class="btn" onclick="changeQty(${id},-1)">−</button>
+    ${qty}
+    <button class="btn" onclick="changeQty(${id},1)">+</button>
+   </div>
+  </div>`;
+ });
+
+ document.getElementById("cartItems").innerHTML=
+ html||"Your cart is empty.";
+
+ document.getElementById("total").textContent=money(total);
+ document.getElementById("count").textContent=count;
+}
+
+function goCart(){
+ document.getElementById("cart").scrollIntoView({behavior:"smooth"});
+}
+
+function toggleAdmin(){
+ document.getElementById("admin").classList.toggle("hidden");
+ renderAdmin();
+}
+
+function addProduct(){
+ let name=document.getElementById("pname").value.trim();
+ let price=Number(document.getElementById("pprice").value);
+ let category=document.getElementById("pcat").value.trim();
+ let file=document.getElementById("pimage").files[0];
+
+ if(!name||!category||!price||price<1){
+  alert("Enter product name, category and valid price.");
+  return;
+ }
+
+ function finish(image){
+  products.push({
+   id:Date.now(),
+   name:name,
+   price:price,
+   category:category,
+   image:image,
+   icon:"🛍️"
+  });
+
+  save();
+  document.getElementById("pname").value="";
+  document.getElementById("pprice").value="";
+  document.getElementById("pcat").value="";
+  document.getElementById("pimage").value="";
+  render();
+  alert("Product added!");
+ }
+
+ if(file){
+  if(!file.type.startsWith("image/")){
+   alert("Choose an image.");
+   return;
+  }
+
+  let reader=new FileReader();
+  reader.onload=e=>{
+   let img=new Image();
+   img.onload=()=>{
+    let canvas=document.createElement("canvas");
+    let scale=Math.min(1,700/Math.max(img.width,img.height));
+    canvas.width=img.width*scale;
+    canvas.height=img.height*scale;
+    canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+    finish(canvas.toDataURL("image/jpeg",0.7));
+   };
+   img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+ }else{
+  finish("");
+ }
+}
+
+function renderAdmin(){
+ let el=document.getElementById("adminList");
+ if(!el)return;
+
+ el.innerHTML="<h3>Product list</h3>"+
+ products.map(p=>`
+ <div class="row">
+  <span>${p.name} — ${money(p.price)}</span>
+  <button class="btn" onclick="removeProduct(${p.id})">Delete</button>
+ </div>
+ `).join("");
+}
+
+function removeProduct(id){
+ if(!confirm("Remove this product?"))return;
+ products=products.filter(p=>p.id!==id);
+ delete cart[id];
+ save();
+ render();
+}
+
+function checkout(){
+ if(Object.keys(cart).length===0){
+  alert("Your cart is empty.");
+  return;
+ }
+
+ let name=document.getElementById("customer").value.trim();
+ let phone=document.getElementById("phone").value.trim();
+ let address=document.getElementById("address").value.trim();
+
+ if(!name||!phone||!address){
+  alert("Please complete your details.");
+  return;
+ }
+
+ alert("Thank you "+name+"! This is a demonstration checkout. Real order delivery will be connected in a future version.");
+}
+
+render();
+
+</script>
+</body>
+  </html>
+  
